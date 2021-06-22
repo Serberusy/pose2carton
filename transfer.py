@@ -18,9 +18,9 @@ from obj_loader import TriangleMesh
 
 
 # ***** 需要你补充的变量) ******
-manual_model_to_smpl = {}
-#(e.g.) manual_model_to_smpl = {0: 0, 1: 3, 2: 2, 3: 1, 4: 6, 5: 5, 6: 4, 7: 9, 8: 8, 9: 7, 10: 12, 11: 14, 12: 13, 21: 19, 22: 18, 23: 21, 24: 20, 16: 17, 17: 16}
+manual_model_to_smpl = { 0:0,  1:3,  2:1,  3:2, 4:6,  5:4,  6:5,  7:9,  8:7,  9:8,  11:13, 13:14,  14:12, 15:10,  16:11,  17:16,  18:17,  19:15,  23:18,  28:19,  38:20,  40:21,  50:22,  57:23 }
 
+#root tr0012_00
 smpl_joint_names = [
     "hips", 
     "leftUpLeg", 
@@ -183,16 +183,20 @@ def transfer_given_pose(human_pose, infoname, is_root_rotated=False):
             hier[parent_name] = [child_name]
         else: 
             hier[parent_name].append(child_name)
+   # print("hier:",hier)
 
     index2joint = {v: k for k, v in joint2index.items()}
     hier_index = {}
     for k, v in hier.items(): 
         hier_index[joint2index[k]] = [joint2index[vv] for vv in v]
     parents = list(hier_index.keys())
+   # print("parents:",parents)
     children = []
     for v in hier_index.values(): 
         children.extend(v)
+    # print("children:",children)
     root = [item for item in parents if item not in children]
+    print("root:", root)
     assert len(root) == 1
     root = root[0]
 
@@ -220,6 +224,7 @@ def transfer_given_pose(human_pose, infoname, is_root_rotated=False):
     print('kinetree table(kinematics connectivity) in the 3d character model')
     print(new_hier)
     new_index2joint = {index: joint for joint, index in new_joint2index.items()}
+    #print(new_index2joint)
     kinetree_table = [[-1, 0]]
     for k, v in new_hier.items(): 
         for vv in v: 
@@ -243,7 +248,11 @@ def transfer_given_pose(human_pose, infoname, is_root_rotated=False):
         vertex_index = int(splits[1])
         for i in range(2, len(splits), 2): 
             joint_name = splits[i]
+           # print("joint name:",joint_name)
             weight = float(splits[i+1])
+           # print("weight:", weight)
+            if joint_name not in new_joint2index:
+                continue
             weights[new_joint2index[joint_name]][vertex_index] = weight
 
     # parse the T pose-skeleton
@@ -468,5 +477,6 @@ if __name__ == '__main__':
 
     # for possible model downloaded online
     # clean_info("samples/Ch14_nonPBR.txt")
-    transfer_one_frame("samples/Ch14_nonPBR.txt", use_online_model=True)
-    # transfer_one_sequence("samples/Ch14_nonPBR.txt", "info_seq_5.pkl", use_online_model=True)
+    # transfer_one_frame("samples/Ch14_nonPBR.txt", use_online_model=True)
+    # transfer_one_sequence("./samples/Ch14_nonPBR.txt", "info_seq_5.pkl", use_online_model=True)
+    transfer_one_sequence("./models/BlackHeart/BlackHeart.txt", "info_seq_5.pkl", use_online_model=True)
