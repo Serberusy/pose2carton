@@ -1,4 +1,7 @@
 import sys
+reload(sys)
+sys.setdefaultencoding("gbk")
+
 import maya 
 import maya.standalone 
 maya.standalone.initialize(name='python')
@@ -51,6 +54,7 @@ def getJointDict(root):
     this_level = [root]
     while this_level:
         next_level = []
+        print("this level:",this_level)
         for p_node in this_level:
             jpos = cmds.xform( p_node, query=True, translation=True, worldSpace=True )
             joint_pos[p_node] = {}
@@ -165,19 +169,31 @@ if __name__ == '__main__':
     # fbx_name = '/home/junjie/xbot.fbx'
     fbx_name = sys.argv[1]
     # fbx_name = "./Ch14_nonPBR.fbx"
-    obj_name = fbx_name.replace(".fbx", ".obj")
-    info_name = fbx_name.replace(".fbx", ".txt")
+    # obj_name = fbx_name.replace(".fbx", ".obj")
+    # info_name = fbx_name.replace(".fbx", ".txt")
+    obj_name = fbx_name.replace(".FBX", ".obj")
+    info_name = fbx_name.replace(".FBX", ".txt")
 
     # import fbx
     cmds.file(new=True, force=True)
     cmds.file(fbx_name, i=True, ignoreVersion=True, type='FBX', ra=True, mergeNamespacesOnClash=False, options="fbx", pr=True)
     cmds.select(clear=True)
     root_name = _getHierarchyRootJoint(cmds.ls(type='joint')[0])
-    
+    # root_name = _getHierarchyRootJoint(cmds.ls(type='joint'))
+    print("root_name", root_name)
+
     # export rig information as txt
     cmds.select(clear=True)
     root_name = _getHierarchyRootJoint(cmds.ls(type='joint')[0])
+    # root_name = _getHierarchyRootJoint(cmds.ls(type='joint'))
+    # root_name = 'root'
     jointDict = getJointDict(root_name)
+    #
+    # root_name2 = 'head'
+    # jointDict2 = getJointDict(root_name2)
+
+    # jointDict.update(jointDict2)
+
     geoList = getGeometryGroups()
     
     # export obj
@@ -187,4 +203,4 @@ if __name__ == '__main__':
     # info_name = 'D:\\ModelResource_Dataset_SIGGRAPH20\\19713.txt'
     with open(info_name, 'w') as file_info:
         record_info(root_name, jointDict, geoList[0], file_info)
-    
+   
