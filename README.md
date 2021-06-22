@@ -2,7 +2,7 @@
 
 EE228 课程大作业 利用3D骨架控制3D卡通人物 (https://github.com/yuzhenbo/pose2carton) 
 
-数据组别： 25
+数据组别： 19
 
 数据类型： 10组匹配 + 5组蒙皮)
 
